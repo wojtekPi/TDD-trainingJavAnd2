@@ -2,6 +2,7 @@ package bank;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -20,6 +21,8 @@ public class PaymentServiceTest {
     public static final String A = "A";
     public static final String B = "B";
 
+    private PaymentService testedObject;
+
     private Object[][] paramsForTestingTranseringAmount() {
         return new Object[][]{
                 {0, 100, 200, -200, 300},
@@ -29,9 +32,13 @@ public class PaymentServiceTest {
         };
     }
 
+    @Before
+    public void setUp(){
+        testedObject = new PaymentService();
+    }
+
     @Test
     public void shouldWorksWithEmptyConstuctor() throws Exception {
-        PaymentService testedObject = new PaymentService();
         assertThat(testedObject).isNotNull();
     }
 
@@ -39,7 +46,6 @@ public class PaymentServiceTest {
     @Parameters(method = "paramsForTestingTranseringAmount")
     public void shouldHaveCorrectBalanceAfterTransferingMoney(int balanceFromBefore, int balanceToBefore,
                                                               int howMuch, int expectedBalanceFrom, int expectedBalanceTo) {
-        PaymentService testedObject = new PaymentService();
         Account from = new Account(A, balanceFromBefore);
         Account to = new Account(B, balanceToBefore);
 
@@ -51,7 +57,6 @@ public class PaymentServiceTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowIllegalArgumentExceptionWhenNotEnoughMoney() {
-        PaymentService testedObject = new PaymentService();
         Account from = new Account(A, -501);
         Account to = new Account(B, 0);
 
@@ -62,7 +67,6 @@ public class PaymentServiceTest {
     public void shouldThrowIllegalArgumentExceptionWithProperMessageWhenNotEnoughMoney() {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage(SORRY_TEXT);
-        PaymentService testedObject = new PaymentService();
         Account from = new Account(A, -501);
         Account to = new Account(B, 0);
 
@@ -71,7 +75,6 @@ public class PaymentServiceTest {
 
     @Test
     public void shouldThrowIllegalArgumentExceptionWithProperMessageWhenNotEnoughMoneyUsingAssertJ() {
-        PaymentService testedObject = new PaymentService();
         Account from = new Account(A, -501);
         Account to = new Account(B, 0);
 
