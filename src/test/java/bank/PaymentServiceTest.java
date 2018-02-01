@@ -17,7 +17,7 @@ public class PaymentServiceTest {
     private Object[][] paramsForTestsAccountB(){
         return new Object[][]{
                 {100,100},
-                {-5,0},
+                {-5,-5},
                 {0, 0},
                 {2000, 2000}
 
@@ -30,7 +30,7 @@ public class PaymentServiceTest {
                 {5,-5},
                 {0, 0},
                 {1, -1},
-                {-5, 0},
+                {-5, 5},
                 {2000, -2000}
         };
     }
@@ -55,6 +55,14 @@ public class PaymentServiceTest {
     }
 
 
+
+
+    private Object[][] paramsForTestAandBStartWithAmmount(){
+        return new Object[][]{
+                {0,100,200,-200,300},
+                {-50, -40, 70, -120, 30}
+        };
+    }
 
 
 
@@ -111,5 +119,18 @@ public class PaymentServiceTest {
         testedObject.transferMoney(from, to, howMuch);
         assertThat(from.getBalance()).isEqualTo(expectedResults);
     }
+
+    @Test
+    @Parameters(method = "paramsForTestAandBStartWithAmmount")
+    public void shouldWorksWithParametrizedTestAandBStartWithAmmount(int balanceA, int balanceB, int howMuch, int expectedResultsA, int expectedResultsB){
+        PaymentService testedObject = new PaymentService();
+
+        Account from = new Account("A", balanceA);
+        Account to = new Account("B", balanceB);
+        testedObject.transferMoney(from, to, howMuch);
+        assertThat(from.getBalance()).isEqualTo(expectedResultsA);
+        assertThat(to.getBalance()).isEqualTo(expectedResultsB);
+    }
+
 
 }
