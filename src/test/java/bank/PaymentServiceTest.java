@@ -12,59 +12,17 @@ import static org.assertj.core.api.AssertionsForClassTypes.in;
 @RunWith(JUnitParamsRunner.class)
 public class PaymentServiceTest {
 
+    public static final String A = "A";
+    public static final String B = "B";
 
-
-    private Object[][] paramsForTestsAccountB(){
+    private Object[][] paramsForTestingTranseringAmount() {
         return new Object[][]{
-                {100,100},
-                {-5,-5},
-                {0, 0},
-                {2000, 2000}
-
+                {0, 100, 200, -200, 300},
+                {-50, -40, 70, -120, 30},
+                {0, 0, 100, -100, 100},
+                {-5, 0, -5, 0, -5}
         };
     }
-
-    private Object[][] paramsForTestsAccountA(){
-        return new Object[][]{
-                {100,-100},
-                {5,-5},
-                {0, 0},
-                {1, -1},
-                {-5, 5},
-                {2000, -2000}
-        };
-    }
-
-    private Object[][] paramsForTestsAccountAStartWithAmmount(){
-        return new Object[][]{
-                {50,70,-20},
-                {-100,50,-150},
-                {0, 0, 0},
-                {2000, 150, 1850}
-
-        };
-    }
-
-    private Object[][] paramsForTestsAccountBStartWithAmmount(){
-        return new Object[][]{
-                {100,100,200},
-                {-100,50,-50},
-                {0, 0, 0},
-                {-20, 100, 80}
-        };
-    }
-
-
-
-
-    private Object[][] paramsForTestAandBStartWithAmmount(){
-        return new Object[][]{
-                {0,100,200,-200,300},
-                {-50, -40, 70, -120, 30}
-        };
-    }
-
-
 
     @Test
     public void shouldWorksWithEmptyConstuctor() throws Exception {
@@ -72,64 +30,18 @@ public class PaymentServiceTest {
         assertThat(testedObject).isNotNull();
     }
 
-
-
     @Test
-    @Parameters(method = "paramsForTestsAccountB")
-    public void shouldWorksWithParametrizedTestB(int howMuch, int expectedResults){
+    @Parameters(method = "paramsForTestingTranseringAmount")
+    public void shouldHaveCorrectBalanceAfterTransferingMoney(int balanceFromBefore, int balanceToBefore,
+                                                              int howMuch, int expectedBalanceFrom, int expectedBalanceTo) {
         PaymentService testedObject = new PaymentService();
+        Account from = new Account(A, balanceFromBefore);
+        Account to = new Account(B, balanceToBefore);
 
-        Account from = new Account("A", 0);
-        Account to = new Account("B", 0);
         testedObject.transferMoney(from, to, howMuch);
-        assertThat(to.getBalance()).isEqualTo(expectedResults);
 
-    }
-
-    @Test
-    @Parameters(method = "paramsForTestsAccountA")
-    public void shouldWorksWithParametrizedTestA(int howMuch, int expectedResults){
-        PaymentService testedObject = new PaymentService();
-
-        Account from = new Account("A", 0);
-        Account to = new Account("B", 0);
-        testedObject.transferMoney(from, to, howMuch);
-        assertThat(from.getBalance()).isEqualTo(expectedResults);
-
-    }
-
-    @Test
-    @Parameters(method = "paramsForTestsAccountBStartWithAmmount")
-    public void shouldWorksWithParametrizedTestBStartWithAmmount(int balance, int howMuch, int expectedResults){
-        PaymentService testedObject = new PaymentService();
-
-        Account from = new Account("A", 0);
-        Account to = new Account("B", balance);
-        testedObject.transferMoney(from, to, howMuch);
-        assertThat(to.getBalance()).isEqualTo(expectedResults);
-    }
-
-    @Test
-    @Parameters(method = "paramsForTestsAccountAStartWithAmmount")
-    public void shouldWorksWithParametrizedTestAStartWithAmmount(int balance, int howMuch, int expectedResults){
-        PaymentService testedObject = new PaymentService();
-
-        Account from = new Account("A", balance);
-        Account to = new Account("B", 0);
-        testedObject.transferMoney(from, to, howMuch);
-        assertThat(from.getBalance()).isEqualTo(expectedResults);
-    }
-
-    @Test
-    @Parameters(method = "paramsForTestAandBStartWithAmmount")
-    public void shouldWorksWithParametrizedTestAandBStartWithAmmount(int balanceA, int balanceB, int howMuch, int expectedResultsA, int expectedResultsB){
-        PaymentService testedObject = new PaymentService();
-
-        Account from = new Account("A", balanceA);
-        Account to = new Account("B", balanceB);
-        testedObject.transferMoney(from, to, howMuch);
-        assertThat(from.getBalance()).isEqualTo(expectedResultsA);
-        assertThat(to.getBalance()).isEqualTo(expectedResultsB);
+        assertThat(from.getBalance()).isEqualTo(expectedBalanceFrom);
+        assertThat(to.getBalance()).isEqualTo(expectedBalanceTo);
     }
 
 
