@@ -8,12 +8,15 @@ public class PaymentService {
         if (isEnoughMoney(from)) {
             throw new IllegalArgumentException(SORRY_TEXT);
         }
+        if (!from.getCurrency().equals(to.getCurrency())&&!from.getCurrency().equals(instrument.getCurrency())) {
+            throw new IllegalArgumentException();
+        }
 
-        from.getBalance().setAmount(from.getBalance().getAmount() - instrument.getAmount());
-        to.getBalance().setAmount(to.getBalance().getAmount() + instrument.getAmount());
+        from.setBalance(from.getBalance() - instrument.getAmount());
+        to.setBalance(to.getBalance() + instrument.getAmount());
     }
 
     private boolean isEnoughMoney(Account from) {
-        return from.getBalance().getAmount() <= -500;
+        return from.getBalance() <= -500;
     }
 }
