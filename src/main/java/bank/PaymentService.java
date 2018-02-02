@@ -4,12 +4,12 @@ public class PaymentService {
 
     private static final String SORRY_TEXT = "I'm very sorry, but you don't have enough money...";
 
-    void transferMoney(Account from, Account to, int howMuch) {
+    void transferMoney(Account from, Account to, Instrument instrument) {
         if (isEnoughMoney(from)) {
             throw new IllegalArgumentException(SORRY_TEXT);
         }
-        from.setBalance(from.getBalance() - howMuch);
-        to.setBalance(to.getBalance() + howMuch);
+        from.setBalance(from.getBalance() - instrument.getAmount());
+        to.setBalance(to.getBalance() + instrument.getAmount());
     }
 
     private boolean isEnoughMoney(Account from) {

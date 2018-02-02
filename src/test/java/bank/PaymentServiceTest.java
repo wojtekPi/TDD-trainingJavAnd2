@@ -22,6 +22,9 @@ public class PaymentServiceTest {
     public static final String B = "B";
 
     private PaymentService testedObject;
+    private Account from;
+    private Account to;
+    private Instrument testInstrument;
 
     private Object[][] paramsForTestingTranseringAmount() {
         return new Object[][]{
@@ -35,6 +38,9 @@ public class PaymentServiceTest {
     @Before
     public void setUp(){
         testedObject = new PaymentService();
+        from = new Account(A, 100);
+        to = new Account(B, 0);
+        testInstrument = new Instrument(100, Currency.PLN);
     }
 
     @Test
@@ -46,10 +52,10 @@ public class PaymentServiceTest {
     @Parameters(method = "paramsForTestingTranseringAmount")
     public void shouldHaveCorrectBalanceAfterTransferingMoney(int balanceFromBefore, int balanceToBefore,
                                                               int howMuch, int expectedBalanceFrom, int expectedBalanceTo) {
-        Account from = new Account(A, balanceFromBefore);
-        Account to = new Account(B, balanceToBefore);
-
-        testedObject.transferMoney(from, to, howMuch);
+        from.setBalance(balanceFromBefore);
+        to.setBalance(balanceToBefore);
+        testInstrument.setAmount(howMuch);
+        testedObject.transferMoney(from, to, testInstrument);
 
         assertThat(from.getBalance()).isEqualTo(expectedBalanceFrom);
         assertThat(to.getBalance()).isEqualTo(expectedBalanceTo);
@@ -57,30 +63,30 @@ public class PaymentServiceTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowIllegalArgumentExceptionWhenNotEnoughMoney() {
-        Account from = new Account(A, -501);
-        Account to = new Account(B, 0);
-
-        testedObject.transferMoney(from, to, 100);
+        from.setBalance(-501);
+        testedObject.transferMoney(from, to, testInstrument);
     }
 
     @Test
     public void shouldThrowIllegalArgumentExceptionWithProperMessageWhenNotEnoughMoney() {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage(SORRY_TEXT);
-        Account from = new Account(A, -501);
-        Account to = new Account(B, 0);
+        from.setBalance(-501);
 
-        testedObject.transferMoney(from, to, 100);
+        testedObject.transferMoney(from, to, testInstrument);
     }
 
     @Test
     public void shouldThrowIllegalArgumentExceptionWithProperMessageWhenNotEnoughMoneyUsingAssertJ() {
-        Account from = new Account(A, -501);
-        Account to = new Account(B, 0);
+        from.setBalance(-501);
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
-                () -> testedObject.transferMoney(from, to, 100)
+                () -> testedObject.transferMoney(from, to, testInstrument)
         ).withMessage(SORRY_TEXT);
     }
+    @Test
+    public void shouldHaveCurrencyChooseOption(){
 
+        testedObject.transferMoney(from, to, testInstrument);
+    }
 }
