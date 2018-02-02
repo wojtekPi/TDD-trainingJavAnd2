@@ -25,10 +25,10 @@ public class PaymentServiceTest {
 
     private Object[][] paramsForTestingTranseringAmount() {
         return new Object[][]{
-                {0, 100, 200, -200, 300},
-                {-50, -40, 70, -120, 30},
-                {0, 0, 100, -100, 100},
-                {-5, 0, -5, 0, -5}
+                {0, 100, 200, -200, 300, Currency.EUR},
+                {-50, -40, 70, -120, 30, Currency.EUR},
+                {0, 0, 100, -100, 100, Currency.EUR},
+                {-5, 0, -5, 0, -5, Currency.EUR}
         };
     }
 
@@ -44,43 +44,47 @@ public class PaymentServiceTest {
 
     @Test
     @Parameters(method = "paramsForTestingTranseringAmount")
-    public void shouldHaveCorrectBalanceAfterTransferingMoney(int balanceFromBefore, int balanceToBefore,
-                                                              int howMuch, int expectedBalanceFrom, int expectedBalanceTo) {
-        Account from = new Account(A, balanceFromBefore);
-        Account to = new Account(B, balanceToBefore);
+    public void shouldHaveCorrectBalanceAfterTransferingMoney(int amountFromBefore, int amountToBefore,
+                                                              int howMuch, int expectedAmountFrom, int expectedAmountTo,
+                                                              Currency currency) {
+        Account from = new Account(A, new Instrument(currency, amountFromBefore));
+        Account to = new Account(B, new Instrument(currency, amountToBefore));
 
-        testedObject.transferMoney(from, to, howMuch);
+        testedObject.transferMoney(from, to, new Instrument(currency, howMuch));
 
-        assertThat(from.getBalance()).isEqualTo(expectedBalanceFrom);
-        assertThat(to.getBalance()).isEqualTo(expectedBalanceTo);
+        assertThat(from.getBalance().getAmount()).isEqualTo(expectedAmountFrom);
+        assertThat(to.getBalance().getAmount()).isEqualTo(expectedAmountTo);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowIllegalArgumentExceptionWhenNotEnoughMoney() {
-        Account from = new Account(A, -501);
-        Account to = new Account(B, 0);
+        Account from = new Account(A, new Instrument(Currency.EUR, -501));
+        Account to = new Account(B, new Instrument(Currency.EUR, 0));
 
-        testedObject.transferMoney(from, to, 100);
+        testedObject.transferMoney(from, to, new Instrument(Currency.EUR, 200));
     }
 
     @Test
     public void shouldThrowIllegalArgumentExceptionWithProperMessageWhenNotEnoughMoney() {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage(SORRY_TEXT);
-        Account from = new Account(A, -501);
-        Account to = new Account(B, 0);
+        Account from = new Account(A, new Instrument(Currency.EUR, -501));
+        Account to = new Account(B, new Instrument(Currency.EUR, 0));
 
-        testedObject.transferMoney(from, to, 100);
+        testedObject.transferMoney(from, to, new Instrument(Currency.EUR, 200));
     }
 
     @Test
     public void shouldThrowIllegalArgumentExceptionWithProperMessageWhenNotEnoughMoneyUsingAssertJ() {
-        Account from = new Account(A, -501);
-        Account to = new Account(B, 0);
+        Account from = new Account(A, new Instrument(Currency.EUR, -501));
+        Account to = new Account(B, new Instrument(Currency.EUR, 0));
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
-                () -> testedObject.transferMoney(from, to, 100)
+                () -> testedObject.transferMoney(from, to, new Instrument(Currency.EUR, 200))
         ).withMessage(SORRY_TEXT);
     }
+
+
+
 
 }
