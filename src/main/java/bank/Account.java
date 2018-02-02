@@ -17,11 +17,16 @@ public class Account {
         this.id = id;
     }
 
-    public Instrument getBalance() {
-        return balance;
+    public void setBalance(int balance) {
+        this.balance.setAmount(balance);
     }
-
-    public void setBalance(Instrument balance) {
-        this.balance = balance;
+    public void setCurrency(Currency currency) {
+        this.balance.setCurrency(currency);
+    }
+    public Currency getCurrency(){
+        return this.balance.getCurrency();
+    }
+    public int getBalance(){
+        return this.balance.getAmount();
     }
 }

@@ -52,8 +52,8 @@ public class PaymentServiceTest {
 
         testedObject.transferMoney(from, to, new Instrument(currency, howMuch));
 
-        assertThat(from.getBalance().getAmount()).isEqualTo(expectedAmountFrom);
-        assertThat(to.getBalance().getAmount()).isEqualTo(expectedAmountTo);
+        assertThat(from.getBalance()).isEqualTo(expectedAmountFrom);
+        assertThat(to.getBalance()).isEqualTo(expectedAmountTo);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -83,8 +83,26 @@ public class PaymentServiceTest {
                 () -> testedObject.transferMoney(from, to, new Instrument(Currency.EUR, 200))
         ).withMessage(SORRY_TEXT);
     }
+    @Test
+    public void shouldHaveCurrencyChooseOption(){
+        Account from = new Account(A, new Instrument(Currency.EUR, 100));
+        Account to = new Account(B, new Instrument(Currency.EUR, 0));
 
+        Instrument instrument = new Instrument(Currency.PLN, 100);
 
+        testedObject.transferMoney(from, to, instrument);
+    }
 
+    @Test (expected = IllegalArgumentException.class)
+    public void shouldThrowIllegalArgumentExceptionWhenCurrenciesAreIncompatible(){
+        Account from = new Account(A, new Instrument(Currency.EUR, 100));
+        Account to = new Account(B, new Instrument(Currency.EUR, 0));
 
+        Instrument instrument = new Instrument(Currency.PLN, 100);
+
+        from.setCurrency(Currency.PLN);
+        to.setCurrency(Currency.EUR);
+        instrument.setCurrency(Currency.USD);
+        testedObject.transferMoney(from, to, instrument);
+    }
 }
