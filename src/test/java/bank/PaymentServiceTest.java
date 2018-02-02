@@ -32,6 +32,18 @@ public class PaymentServiceTest {
         };
     }
 
+    private Object[][] paramsForTestingTranseringCurrency() {
+        return new Object[][]{
+                {Currency.PLN, Currency.EUR, Currency.EUR},
+                {Currency.USD, Currency.EUR, Currency.EUR},
+                {Currency.EUR, Currency.PLN, Currency.EUR},
+                {Currency.PLN, Currency.PLN, Currency.EUR},
+                {Currency.USD, Currency.USD, Currency.EUR}
+        };
+    }
+
+
+
     @Before
     public void setUp(){
         testedObject = new PaymentService();
@@ -83,6 +95,18 @@ public class PaymentServiceTest {
                 () -> testedObject.transferMoney(from, to, new Instrument(Currency.EUR, 200))
         ).withMessage(SORRY_TEXT);
     }
+
+    @Test
+    @Parameters(method = "paramsForTestingTranseringCurrency")
+    public void shouldThrowIllegalArgumentExceptionWhenNotCompatibleCurrency(Currency currecyAccoutTo, Currency currencyAccoutFrom, Currency currencyInstrument) {
+        Account from = new Account(A, new Instrument(currencyAccoutFrom, 0));
+        Account to = new Account(B, new Instrument(currecyAccoutTo, 0));
+
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
+                () -> testedObject.transferMoney(from, to, new Instrument(currencyInstrument, 0))
+        );
+    }
+
 
 
 
