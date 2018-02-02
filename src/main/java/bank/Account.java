@@ -2,9 +2,9 @@ package bank;
 
 public class Account {
     private String id;
-    private int balance;
+    private Instrument balance;
 
-    public Account(String id, int balance) {
+    public Account(String id, Instrument balance) {
         this.id = id;
         this.balance = balance;
     }
@@ -17,11 +17,11 @@ public class Account {
         this.id = id;
     }
 
-    public int getBalance() {
+    public Instrument getBalance() {
         return balance;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(Instrument balance) {
         this.balance = balance;
     }
 }

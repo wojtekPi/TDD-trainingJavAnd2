@@ -1,11 +1,7 @@
 package bank;
 
-/**
- * Currencies for account
- */
-
 public enum Currency {
+    PLN,
     USD,
-    EUR,
-    PLN
+    EUR
 }
