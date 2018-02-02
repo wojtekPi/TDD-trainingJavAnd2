@@ -8,7 +8,8 @@ public class PaymentService {
         if (isEnoughMoney(from)) {
             throw new IllegalArgumentException(SORRY_TEXT);
         }
-        if(from.getBalance().getCurrency() != to.getBalance().getCurrency()){
+        if(from.getBalance().getCurrency()!= instrument.getCurrency() ||
+                to.getBalance().getCurrency() != instrument.getCurrency()){
             throw new IllegalArgumentException();
         }
 
