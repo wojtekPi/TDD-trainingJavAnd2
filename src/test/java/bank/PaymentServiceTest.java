@@ -84,9 +84,17 @@ public class PaymentServiceTest {
                 () -> testedObject.transferMoney(from, to, testInstrument)
         ).withMessage(SORRY_TEXT);
     }
+
     @Test
     public void shouldHaveCurrencyChooseOption(){
+        testedObject.transferMoney(from, to, testInstrument);
+    }
 
+    @Test (expected = IllegalArgumentException.class)
+    public void shouldThrowIllegalArgumentExceptionWhenCurrenciesAreIncompatible(){
+        from.setCurrency(Currency.PLN);
+        to.setCurrency(Currency.EUR);
+        testInstrument.setCurrency(Currency.USD);
         testedObject.transferMoney(from, to, testInstrument);
     }
 }
