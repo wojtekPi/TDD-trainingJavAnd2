@@ -9,11 +9,11 @@ public class PaymentService {
             throw new IllegalArgumentException(SORRY_TEXT);
         }
 
-        from.getInstrument().setAmount(from.getInstrument().getAmount() - instrument.getAmount());
-        to.getInstrument().setAmount(to.getInstrument().getAmount() + instrument.getAmount());
+        from.getBalance().setAmount(from.getBalance().getAmount() - instrument.getAmount());
+        to.getBalance().setAmount(to.getBalance().getAmount() + instrument.getAmount());
     }
 
     private boolean isEnoughMoney(Account from) {
-        return from.getInstrument().getAmount() <= -500;
+        return from.getBalance().getAmount() <= -500;
     }
 }

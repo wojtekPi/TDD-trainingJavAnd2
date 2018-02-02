@@ -52,8 +52,8 @@ public class PaymentServiceTest {
 
         testedObject.transferMoney(from, to, new Instrument(currency, howMuch));
 
-        assertThat(from.getInstrument().getAmount()).isEqualTo(expectedAmountFrom);
-        assertThat(to.getInstrument().getAmount()).isEqualTo(expectedAmountTo);
+        assertThat(from.getBalance().getAmount()).isEqualTo(expectedAmountFrom);
+        assertThat(to.getBalance().getAmount()).isEqualTo(expectedAmountTo);
     }
 
     @Test(expected = IllegalArgumentException.class)

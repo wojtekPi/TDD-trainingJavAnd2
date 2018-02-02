@@ -2,11 +2,11 @@ package bank;
 
 public class Account {
     private String id;
-    private Instrument instrument;
+    private Instrument balance;
 
-    public Account(String id, Instrument instrument) {
+    public Account(String id, Instrument balance) {
         this.id = id;
-        this.instrument = instrument;
+        this.balance = balance;
     }
 
     public String getId() {
@@ -17,11 +17,11 @@ public class Account {
         this.id = id;
     }
 
-    public Instrument getInstrument() {
-        return instrument;
+    public Instrument getBalance() {
+        return balance;
     }
 
-    public void setInstrument(Instrument instrument) {
-        this.instrument = instrument;
+    public void setBalance(Instrument balance) {
+        this.balance = balance;
     }
 }
