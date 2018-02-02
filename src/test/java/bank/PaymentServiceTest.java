@@ -82,8 +82,9 @@ public class PaymentServiceTest {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
                 () -> testedObject.transferMoney(from, to, new Instrument(Currency.EUR, 200))
         ).withMessage(SORRY_TEXT);
-    }
+    //added comment
 
+    }
 
 
 
