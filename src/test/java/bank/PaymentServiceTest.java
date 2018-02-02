@@ -84,7 +84,13 @@ public class PaymentServiceTest {
         ).withMessage(SORRY_TEXT);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowIllegalArgumentExceptionWhenCurrenciesAreDifferent() {
+        Account from = new Account(A, new Instrument(Currency.PLN, 200));
+        Account to = new Account(B, new Instrument(Currency.EUR, 0));
 
+        testedObject.transferMoney(from, to, new Instrument(Currency.EUR, 100));
+    }
 
 
 }

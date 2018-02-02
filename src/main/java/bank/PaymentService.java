@@ -8,6 +8,9 @@ public class PaymentService {
         if (isEnoughMoney(from)) {
             throw new IllegalArgumentException(SORRY_TEXT);
         }
+        if(from.getBalance().getCurrency() != to.getBalance().getCurrency()){
+            throw new IllegalArgumentException();
+        }
 
         from.getBalance().setAmount(from.getBalance().getAmount() - instrument.getAmount());
         to.getBalance().setAmount(to.getBalance().getAmount() + instrument.getAmount());
