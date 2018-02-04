@@ -24,4 +24,9 @@ public class Instrument {
     public void setAmount(int amount) {
         this.amount = amount;
     }
+
+    @Override
+    public String toString() {
+        return "Instrument{" + "currency=" + currency + ", amount=" + amount + '}';
+    }
 }
