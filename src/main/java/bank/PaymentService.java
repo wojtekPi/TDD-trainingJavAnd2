@@ -1,9 +1,6 @@
 package bank;
 
 public class PaymentService {
-    private ExchangeService exchangeService;
-
-
 
     private ExchangeService exchangeService;
     private TransactionDB transactionDB;

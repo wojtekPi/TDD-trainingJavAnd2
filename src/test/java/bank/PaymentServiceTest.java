@@ -149,10 +149,11 @@ public class PaymentServiceTest {
         Instrument howMany = new Instrument(PLN, 80);
 
         ExchangeService exchangeService = mock(ExchangeService.class);
+        TransactionDB transactionDBmock = mock(TransactionDB.class);
         Mockito.when(exchangeService.calculate(howMany,EUR)).thenReturn(20);
+
         testedObject.setExchangeService(exchangeService);
-
-
+        testedObject.setTransactionDB(transactionDBmock);
         testedObject.transferMoney(from, to, howMany);
 
         assertThat(to.getBalance().getAmount()).isEqualTo(20);
