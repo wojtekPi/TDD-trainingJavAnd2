@@ -1,6 +1,7 @@
 package bank;
 
 public class PaymentService {
+    private ExchangeService exchangeService;
 
 
 
@@ -33,7 +34,6 @@ public class PaymentService {
 
     private boolean isTheSameCurrency(Account from, Account to, Instrument instrument) {
         return instrument.getCurrency().equals(from.getBalance().getCurrency());
-
     }
 
     public void setExchangeService(ExchangeService exchangeService) {

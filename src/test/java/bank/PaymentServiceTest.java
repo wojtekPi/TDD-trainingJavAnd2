@@ -7,6 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
 import static bank.Currency.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -24,11 +25,21 @@ public class PaymentServiceTest {
     private PaymentService testedObject;
 
     private Object[][] paramsForTestingTranseringAmount() {
-        return new Object[][]{{0, 100, 200, -200, 300, EUR}, {-50, -40, 70, -120, 30, EUR}, {0, 0, 100, -100, 100, EUR}, {-5, 0, -5, 0, -5, EUR}};
+        return new Object[][]{
+                {0, 100, 200, -200, 300, EUR},
+                {-50, -40, 70, -120, 30, EUR},
+                {0, 0, 100, -100, 100, EUR},
+                {-5, 0, -5, 0, -5, EUR}
+        };
     }
 
     private Object[][] paramsForTestingTranseringCurrency() {
-        return new Object[][]{{PLN, EUR, PLN}, {USD, EUR, USD}, {EUR, PLN, EUR}, {USD, PLN, USD}};
+        return new Object[][]{
+                {PLN, EUR, EUR},
+                {USD, EUR, EUR},
+                {PLN, PLN, EUR},
+                {USD, USD, EUR}
+        };
     }
 
 
@@ -79,12 +90,16 @@ public class PaymentServiceTest {
         Account from = new Account(A, new Instrument(EUR, -501));
         Account to = new Account(B, new Instrument(EUR, 0));
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> testedObject.transferMoney(from, to, new Instrument(EUR, 200))).withMessage(SORRY_TEXT);
+
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
+                () -> testedObject.transferMoney(from, to, new Instrument(EUR, 200))
+        ).withMessage(SORRY_TEXT);
     }
 
     @Test
     @Parameters(method = "paramsForTestingTranseringCurrency")
-    public void shouldThrowIllegalArgumentExceptionWhenNotCompatibleCurrency(Currency currecyAccoutTo, Currency currencyAccoutFrom, Currency currencyInstrument) {
+    public void shouldThrowIllegalArgumentExceptionWhenNotCompatibleCurrency(Currency currencyAccoutFrom,
+                                                                             Currency currecyAccoutTo, Currency currencyInstrument) {
         Account from = new Account(A, new Instrument(currencyAccoutFrom, 0));
         Account to = new Account(B, new Instrument(currecyAccoutTo, 0));
 
@@ -118,6 +133,26 @@ public class PaymentServiceTest {
 
         testedObject.setExchangeService(exchangeServiceMock);
         testedObject.setTransactionDB(transactionDBMock);
+
+        ExchangeService exchangeService = mock(ExchangeService.class);
+        testedObject.setExchangeService(exchangeService);
+
+        testedObject.transferMoney(from, to, howMany);
+
+        verify(exchangeService, times(1)).calculate(howMany, EUR);
+    }
+
+    @Test
+    public void shouldUseCalculetedAmountFromExchangeServiceWhenCurrenciesDiffers() {
+        Account from = new Account(A, new Instrument(PLN, 110));
+        Account to = new Account(B, new Instrument(EUR, 0));
+        Instrument howMany = new Instrument(PLN, 80);
+
+        ExchangeService exchangeService = mock(ExchangeService.class);
+        Mockito.when(exchangeService.calculate(howMany,EUR)).thenReturn(20);
+        testedObject.setExchangeService(exchangeService);
+
+
         testedObject.transferMoney(from, to, howMany);
 
         assertThat(to.getBalance().getAmount()).isEqualTo(20);
@@ -139,6 +174,5 @@ public class PaymentServiceTest {
         verify(transactionDBMock, times(1)).save(from, to, howMany);
 
     }
-
 
 }
