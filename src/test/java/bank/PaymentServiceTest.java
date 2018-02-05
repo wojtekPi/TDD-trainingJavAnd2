@@ -164,16 +164,17 @@ public class PaymentServiceTest {
     }
 
     @Test
-    public void shouldSaveTransactionToDbWhenServiceSaveTransactionToDb(){
+    public void shouldSaveTransactionToDbWhenMoneyWasTransfered(){
         Account from = new Account(A, new Instrument(PLN, 0));
         Account to = new Account(B, new Instrument(PLN, 0));
         Instrument howMany = new Instrument(PLN, 10);
 
         TransactionDB transactionDBMock = mock(TransactionDB.class);
         testedObject.setTransactionDB(transactionDBMock);
-        testedObject.transferMoney(from, to, howMany);
-        verify(transactionDBMock, times(1)).save(from, to, howMany);
 
+        testedObject.transferMoney(from, to, howMany);
+
+        verify(transactionDBMock).save(from, to, howMany);
     }
 
 }
