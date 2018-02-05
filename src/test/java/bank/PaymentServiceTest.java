@@ -18,12 +18,10 @@ import static org.mockito.Mockito.*;
 public class PaymentServiceTest {
 
     public static final String SORRY_TEXT = "I'm very sorry, but you don't have enough money...";
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
     public static final String A = "A";
     public static final String B = "B";
-
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
     private PaymentService testedObject;
 
     private Object[][] paramsForTestingTranseringAmount() {
@@ -57,12 +55,12 @@ public class PaymentServiceTest {
 
     @Test
     @Parameters(method = "paramsForTestingTranseringAmount")
-    public void shouldHaveCorrectBalanceAfterTransferingMoney(int amountFromBefore, int amountToBefore,
-                                                              int howMuch, int expectedAmountFrom, int expectedAmountTo,
-                                                              Currency currency) {
+    public void shouldHaveCorrectBalanceAfterTransferingMoney(int amountFromBefore, int amountToBefore, int howMuch, int expectedAmountFrom, int expectedAmountTo, Currency currency) {
         Account from = new Account(A, new Instrument(currency, amountFromBefore));
         Account to = new Account(B, new Instrument(currency, amountToBefore));
 
+        TransactionDB transactionDBMock = mock(TransactionDB.class);
+        testedObject.setTransactionDB(transactionDBMock);
         testedObject.transferMoney(from, to, new Instrument(currency, howMuch));
 
         assertThat(from.getBalance().getAmount()).isEqualTo(expectedAmountFrom);
@@ -92,6 +90,7 @@ public class PaymentServiceTest {
         Account from = new Account(A, new Instrument(EUR, -501));
         Account to = new Account(B, new Instrument(EUR, 0));
 
+
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
                 () -> testedObject.transferMoney(from, to, new Instrument(EUR, 200))
         ).withMessage(SORRY_TEXT);
@@ -104,9 +103,7 @@ public class PaymentServiceTest {
         Account from = new Account(A, new Instrument(currencyAccoutFrom, 0));
         Account to = new Account(B, new Instrument(currecyAccoutTo, 0));
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
-                () -> testedObject.transferMoney(from, to, new Instrument(currencyInstrument, 0))
-        );
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> testedObject.transferMoney(from, to, new Instrument(currencyInstrument, 0)));
     }
 
     @Test
@@ -114,6 +111,28 @@ public class PaymentServiceTest {
         Account from = new Account(A, new Instrument(PLN, 100));
         Account to = new Account(B, new Instrument(EUR, 0));
         Instrument howMany = new Instrument(PLN, 80);
+
+        ExchangeService exchangeServiceMock = mock(ExchangeService.class);
+        TransactionDB transactionDBMock = mock(TransactionDB.class);
+        testedObject.setExchangeService(exchangeServiceMock);
+        testedObject.setTransactionDB(transactionDBMock);
+        testedObject.transferMoney(from, to, howMany);
+
+        verify(exchangeServiceMock, times(1)).calculate(howMany, EUR);
+    }
+
+    @Test
+    public void shouldUseCalculatedAmountFromExchangeServiceWhenCurrenciesIs() {
+        Account from = new Account(A, new Instrument(PLN, 110));
+        Account to = new Account(B, new Instrument(EUR, 0));
+        Instrument howMany = new Instrument(PLN, 80);
+
+        ExchangeService exchangeServiceMock = mock(ExchangeService.class);
+        TransactionDB transactionDBMock = mock(TransactionDB.class);
+        when(exchangeServiceMock.calculate(howMany, EUR)).thenReturn(20);
+
+        testedObject.setExchangeService(exchangeServiceMock);
+        testedObject.setTransactionDB(transactionDBMock);
 
         ExchangeService exchangeService = mock(ExchangeService.class);
         testedObject.setExchangeService(exchangeService);
@@ -130,16 +149,32 @@ public class PaymentServiceTest {
         Instrument howMany = new Instrument(PLN, 80);
 
         ExchangeService exchangeService = mock(ExchangeService.class);
+        TransactionDB transactionDBmock = mock(TransactionDB.class);
         Mockito.when(exchangeService.calculate(howMany,EUR)).thenReturn(20);
-        testedObject.setExchangeService(exchangeService);
 
+        testedObject.setExchangeService(exchangeService);
+        testedObject.setTransactionDB(transactionDBmock);
         testedObject.transferMoney(from, to, howMany);
 
         assertThat(to.getBalance().getAmount()).isEqualTo(20);
         assertThat(from.getBalance().getCurrency()).isEqualTo(PLN);
         assertThat(from.getBalance().getAmount()).isEqualTo(30);
         assertThat(to.getBalance().getCurrency()).isEqualTo(EUR);
+
     }
 
+    @Test
+    public void shouldSaveTransactionToDbWhenMoneyWasTransfered(){
+        Account from = new Account(A, new Instrument(PLN, 0));
+        Account to = new Account(B, new Instrument(PLN, 0));
+        Instrument howMany = new Instrument(PLN, 10);
+
+        TransactionDB transactionDBMock = mock(TransactionDB.class);
+        testedObject.setTransactionDB(transactionDBMock);
+
+        testedObject.transferMoney(from, to, howMany);
+
+        verify(transactionDBMock).save(from, to, howMany);
+    }
 
 }

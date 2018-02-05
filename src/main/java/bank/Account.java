@@ -24,4 +24,9 @@ public class Account {
     public void setBalance(Instrument balance) {
         this.balance = balance;
     }
+
+    @Override
+    public String toString() {
+        return "Account{" + "id='" + id + '\'' + ", balance=" + balance + '}';
+    }
 }
